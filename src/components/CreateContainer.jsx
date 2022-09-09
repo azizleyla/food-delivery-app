@@ -17,8 +17,7 @@ import {
   uploadBytesResumable,
 } from "firebase/storage";
 import { storage } from "../firebase.config";
-import { getAllFoodItems, saveItem } from "../utils/firebaseFunctions";
-import { actionType } from "../context/reducer";
+import { saveItem } from "../utils/firebaseFunctions";
 import { useStateValue } from "../context/StateProvider";
 
 const CreateContainer = () => {
@@ -31,12 +30,14 @@ const CreateContainer = () => {
   const [alertStatus, setAlertStatus] = useState("danger");
   const [msg, setMsg] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [{ foodItems }, dispatch] = useStateValue();
 
   const uploadImage = (e) => {
     setIsLoading(true);
     const imageFile = e.target.files[0];
-    const storageRef = ref(storage, `Images/${Date.now()}-${imageFile.name}`);
+    const storageRef = ref(
+      storage,
+      `Images/${Date.now()}-${imageFile.name}`,
+    );
     const uploadTask = uploadBytesResumable(storageRef, imageFile);
 
     uploadTask.on(
@@ -66,7 +67,7 @@ const CreateContainer = () => {
             setFields(false);
           }, 4000);
         });
-      }
+      },
     );
   };
 
@@ -88,7 +89,7 @@ const CreateContainer = () => {
   const saveDetails = () => {
     setIsLoading(true);
     try {
-      if (!title || !calories || !imageAsset || !price || !category) {
+      if (!title || !calories || !price || !category) {
         setFields(true);
         setMsg("Required fields can't be empty");
         setAlertStatus("danger");
@@ -126,8 +127,6 @@ const CreateContainer = () => {
         setIsLoading(false);
       }, 4000);
     }
-
-    fetchData();
   };
 
   const clearData = () => {
@@ -136,15 +135,6 @@ const CreateContainer = () => {
     setCalories("");
     setPrice("");
     setCategory("Select Category");
-  };
-
-  const fetchData = async () => {
-    await getAllFoodItems().then((data) => {
-      dispatch({
-        type: actionType.SET_FOOD_ITEMS,
-        foodItems: data,
-      });
-    });
   };
 
   return (
